@@ -11,9 +11,12 @@ public class Searchresult extends JFrame{
 	public Searchresult()
 	{
 		JPanel result = new JPanel();
-		
+		super.setSize(1000, 650);
 		JPanel nextpanel = new JPanel(new GridLayout(1,3));
-        JButton more = new JButton("ªÛºº∫∏±‚");
-        JButton close = new JButton("¥›±‚");
+        JButton more = new JButton("ÏÉÅÏÑ∏Î≥¥Í∏∞");
+        JButton close = new JButton("Ï∑®ÏÜå");
+        
+        super.setVisible(true);
+		super.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
 }
