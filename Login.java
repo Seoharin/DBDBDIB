@@ -1,3 +1,5 @@
+
+  
 package dbdbdib;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -12,7 +14,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.HashMap;
 import java.util.Scanner;
-
+import java.sql.*;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -22,6 +24,9 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 public class Login extends JFrame {
+		public static final String URL = "jdbc:oracle:thin:@localhost:1521:orcl";
+	   public static final String USER_UNIVERSITY ="university";
+	   public static final String USER_PASSWD ="comp322";
 
 	
 	public Login() {
@@ -74,29 +79,89 @@ public class Login extends JFrame {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		
+		
+		//DB랑 연결
+		  
 		logbtn.addActionListener(new ActionListener() {
-			
-			
 			public void actionPerformed(ActionEvent e)
 			{
+				String id = idfield.getText().toString();
+				Connection conn = null; // Connection object
+				Statement stmt = null;   // Statement object
+				String sql ="";
+				try {
+				        //Load a JDBC driver for Oracle DBMS
+				        Class.forName("oracle.jdbc.driver.OracleDriver");
+				        //Get a Connection object
+				        System.out.println("Success!");
+				     }catch(ClassNotFoundException ee) {
+				        System.err.println("error = "+ee.getMessage());
+				        System.exit(1);
+				     }
+				  try {
+				       conn = DriverManager.getConnection(URL,USER_UNIVERSITY,USER_PASSWD);
+				        System.out.println("디비연결성공");
+				     }catch(SQLException ex) {
+				        ex.printStackTrace();
+				        System.err.println("Cannot get a connection: "+ex.getMessage());
+				        System.exit(1);
+				     }
+				       
 				//DB에 해당 account 가 있으면 
-				if()
-				{
-					if() { //when administer account
-						new Administer(id);
-					}
-					else { //when customer account
-						new MovieList(id);
-					}
-				}
+				  try {
+					  conn.setAutoCommit(false);
+					  stmt = conn.createStatement();
+					 sql = "SELECT * FROM ACCOUNT WHERE Account_id = '"+id+"'";
+					 ResultSet rs = stmt.executeQuery(sql);
+					 System.out.println(sql);
+					 
+					 if(rs != null)
+						{
+						 sql = "SELECT password FROM ACCOUNT WHERE Account_id ='"
+								 +id+"'";
+						 rs = stmt.executeQuery(sql);
+						 String inputpw = pwfield.getText().toString();
+						 String pw="";
+						 while(rs.next()) {
+							 pw = rs.getString(1);
+						 }
+						 if(pw.equals(inputpw)) {		//비밀번호 맞으면
+							 sql = "SELECT is_customer FROM ACCOUNT WHERE Account_id = '"
+									 +id+"'";
+							 rs = stmt.executeQuery(sql);
+							 String iscustomer="";
+							 while(rs.next())
+							 {
+								 iscustomer = rs.getString(1);
+							 }
+								if(iscustomer.equals("false")) { //when administer account
+									new ManagerAccount(id);
+								}
+								else { //when customer account
+									new MovieList(id);
+								}
+							}
+						 else { //비밀번호 틀리면 
+							 JOptionPane.showMessageDialog(null, "아이디 또는 비밀번호가 틀립니다.");
+								idfield.setText("");
+								pwfield.setText("");
+						 }
+						}
+						//DB에 해당 ACCOUNT 가 없으면 
+						else
+						{
+							JOptionPane.showMessageDialog(null, "아이디 또는 비밀번호가 틀립니다.");
+							idfield.setText("");
+							pwfield.setText("");
+						}
+					 
+					 
+				  }catch(SQLException ex2) {					  
+					  System.exit(1);
+				  }
+				       
+				  
 				
-				//DB에 해당 ACCOUNT 가 없으면 
-				else
-				{
-					JOptionPane.showMessageDialog(null, "아이디 또는 비밀번호가 틀립니다.");
-					idfield.setText("");
-					pwfield.setText("");
-				}
 					
 			}
 		});
@@ -119,3 +184,4 @@ public class Login extends JFrame {
 	
 
 }
+
