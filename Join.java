@@ -10,6 +10,11 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Scanner;
 
@@ -24,7 +29,20 @@ import javax.swing.JPasswordField;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 public class Join extends JFrame {
-
+	public static final String URL = "jdbc:oracle:thin:@localhost:1521:orcl";
+	   public static final String USER_UNIVERSITY ="university";
+	   public static final String USER_PASSWD ="comp322";
+	   Connection conn = null; // Connection object
+		Statement stmt = null;   // Statement object
+		String sql ="";
+		String name;
+		String id;
+		String pw;
+		String birth;
+		String address;
+		String sex;
+		String job;
+		String phone;
 	private boolean key =false; //ID중복확인을 했는지
 	public Join() {
 		JPanel join = new JPanel();
@@ -58,7 +76,7 @@ public class Join extends JFrame {
 		pw2panel.add(pw2field);
 		
 		JPanel birthpanel = new JPanel();
-		JLabel birthlabel = new JLabel("생년월일(yyyymmdd): ");
+		JLabel birthlabel = new JLabel("생년월일(mm-dd-yyyy): ");
 		JTextField birthfield = new JTextField(30);
 		birthpanel.add(birthlabel);
 		birthpanel.add(birthfield);
@@ -71,11 +89,11 @@ public class Join extends JFrame {
 		
 		JPanel sexpanel = new JPanel();
 		JLabel sexlabel = new JLabel("성별: ");
-		ButtonGroup sex = new ButtonGroup();
+		ButtonGroup sexbtn = new ButtonGroup();
 		JRadioButton m = new JRadioButton("남");
 		JRadioButton f = new JRadioButton("여");
-		sex.add(m);
-		sex.add(f);
+		sexbtn.add(m);
+		sexbtn.add(f);
 		sexpanel.add(sexlabel);
 		sexpanel.add(m);
 		sexpanel.add(f);
@@ -111,42 +129,102 @@ public class Join extends JFrame {
 		add(phonepanel);
 		add(joinbtn);
 		
+		
 		setVisible(true);
 		setSize(1000,650);
 		setLocationRelativeTo(null); 		//윈도우를 컴퓨터 중간에 띄우기
 		setResizable(false);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
+		
+		try {
+		        //Load a JDBC driver for Oracle DBMS
+		        Class.forName("oracle.jdbc.driver.OracleDriver");
+		        //Get a Connection object
+		        System.out.println("Success!");
+		     }catch(ClassNotFoundException ee) {
+		        System.err.println("error = "+ee.getMessage());
+		        System.exit(1);
+		     }
+		  try {
+		       conn = DriverManager.getConnection(URL,USER_UNIVERSITY,USER_PASSWD);
+		        System.out.println("디비연결성공");
+		     }catch(SQLException ex) {
+		        ex.printStackTrace();
+		        System.err.println("Cannot get a connection: "+ex.getMessage());
+		        System.exit(1);
+		     }
+		
 		id_duple_btn.addActionListener(new ActionListener() {
 			//id중복확인버튼 눌렀을 때
 			public void actionPerformed(ActionEvent e)
 			{
-				String id = idfield.getText();
-				if(id.compareTo("")==0) { //idfield에 아무입력 없을 때
-					JOptionPane.showMessageDialog(null,"ID를 입력해주세요.");
-				}
-				else {	//idfield에 입력있을 때
-					if() { //이미 있는 아이디 일 때
-						JOptionPane.showMessageDialog(null,"이미 있는 ID 입니다.");
-						idfield.setText(""); //idfield 초기화
-					}
-					else { //사용가능한 아이디 일 때
-						JOptionPane.showMessageDialog(null, "사용가능한 ID 입니다.");
-						key = true;
-					}
-					
-				}
-				
+				  String id = idfield.getText();
+				  try {
+					  conn.setAutoCommit(false);
+					  stmt = conn.createStatement();
+					 sql = "SELECT * FROM ACCOUNT WHERE Account_id = '"+id+"'";
+					 ResultSet rs = stmt.executeQuery(sql);
+					 //System.out.println(sql);
+					 
+					 if(id.compareTo("")==0) { //idfield에 아무입력 없을 때
+							JOptionPane.showMessageDialog(null,"ID를 입력해주세요.");
+						}
+					 else 
+					 {
+					 if(rs.next()) //이미 있는 id일 때
+						{
+						 JOptionPane.showMessageDialog(null, "이미있는 ID입니다.");
+						 idfield.setText("");
+						 }
+						 
+						//사용가능한 id일 때
+					else {
+							JOptionPane.showMessageDialog(null, "사용가능한 ID입니다.");
+							key = true;
+						}
+					 }
+					 }catch(SQLException ex2) {					  
+					  System.exit(1);
+				  }	
 			}
 		});
+		
+		
+		
 		
 		joinbtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e)
 			{
+				
 				if(key) //id중복확인을 했을 경우
 				{
 					if(pwfield.getText().equals(pw2field.getText()))
 					{ //pw와 pw확인의 값이 같을 때
+						name = namefield.getText();
+						id = idfield.getText();
+						pw = pwfield.getText();
+						birth = birthfield.getText();
+						address =addressfield.getText();
+						if(sexbtn.getSelection().equals("남"))
+							sex = "true";
+						else 
+							sex = "false";
+						
+						job = jobfield.getText();
+						phone = phonefield.getText();
+						
+						try {
+							sql = "INSERT INTO ACCOUNT VALUES('"+id+"','"+name+"','"+sex
+									+"',TO_DATE('"+birth+"','mm-dd-yyyy'),'"+address+"','"+job+"','"+phone
+									+"','"+pw+"','true')";
+							System.out.println(sql);
+							int res = stmt.executeUpdate(sql);
+							conn.commit();
+						}catch(SQLException ex2) {
+							System.err.println("sql error = "+ex2.getMessage());
+							System.exit(1);
+						}
 					  //account에 insert
 						
 						JOptionPane.showMessageDialog(null, "회원가입을 축하합니다!");
@@ -155,7 +233,6 @@ public class Join extends JFrame {
 					}
 					else
 					{ //pw와 pw확인의 값이 다를 때
-						idfield.setText("");
 	                    pwfield.setText("");
 	                    pw2field.setText("");
 	                    key = false;
@@ -165,7 +242,10 @@ public class Join extends JFrame {
 				}
 				else	//id중복확인 안한경우
 				{
-					OptionPane.showMessageDialog(null, "ID 중복확인을 해주세요.");
+					JOptionPane.showMessageDialog(null, "ID 중복확인을 해주세요.");
+					idfield.setText("");
+                    pwfield.setText("");
+                    pw2field.setText("");
 				}
 				
 			}
