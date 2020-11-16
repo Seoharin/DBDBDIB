@@ -106,9 +106,9 @@ public class Moredeep extends JFrame{
 		  while(rs.next())
 		  {
 			  score = rs.getString(2);
-			  if(score.length()>2)
+			  if(score.length()>4)
 			  {
-				  score = score.substring(0, 4);
+				  score = score.substring(0, 3);
 			  }
 			  
 		  }
