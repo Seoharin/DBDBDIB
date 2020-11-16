@@ -1,244 +1,431 @@
 package dbdbdib;
+
 import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Font;
+import java.awt.Choice;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.EOFException;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Scanner;
-import java.util.StringTokenizer;
 
-import javax.swing.AbstractButton;
-import javax.swing.BoxLayout;
-import javax.swing.ButtonGroup;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JPasswordField;
-import javax.swing.JRadioButton;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
-public class MovieList extends JFrame{
-	
+
+public class Moredeep extends JFrame{
+	//상세정보 보여주는 class 
 	public static final String URL = "jdbc:oracle:thin:@localhost:1521:orcl";
 	   public static final String USER_UNIVERSITY ="university";
 	   public static final String USER_PASSWD ="comp322";
 	   Connection conn = null; // Connection object
 		Statement stmt = null;   // Statement object
-		ArrayList non_rate_movie = new ArrayList<Integer>();
-		ArrayList btnlist = new ArrayList<JRadioButton>();
-		String username="";
-	public MovieList(String id) {
-		// TODO Auto-generated method stub
-
+		String sql ="";
+		String title= "";
+		String is_adult="";
+		String runtime_minute = "";
+		String ost ="";
+		String audience = "";
+		String hasclip ="";
+		String director ="";
+		String writer = "";
+		String startyear ="";
+		String endyear = "";
+		String year = "";
+		String type = "";
+		String score = "";
+		ArrayList<Integer> version = new ArrayList<Integer>(); 
+		ArrayList<Integer> genre = new ArrayList<Integer>(); 
+	public Moredeep(int title_id, String Account_id)
+	{
+		
 		try {
-		        //Load a JDBC driver for Oracle DBMS
-		        Class.forName("oracle.jdbc.driver.OracleDriver");
-		        //Get a Connection object
-		        System.out.println("Success!");
-		     }catch(ClassNotFoundException ee) {
-		        System.err.println("error = "+ee.getMessage());
-		        System.exit(1);
-		     }
-		  try {
-		       conn = DriverManager.getConnection(URL,USER_UNIVERSITY,USER_PASSWD);
-		        System.out.println("디비연결성공");
-		     }catch(SQLException ex) {
-		        ex.printStackTrace();
-		        System.err.println("Cannot get a connection: "+ex.getMessage());
-		        System.exit(1);
-		     } //DB랑 연결
+	        //Load a JDBC driver for Oracle DBMS
+	        Class.forName("oracle.jdbc.driver.OracleDriver");
+	        //Get a Connection object
+	        System.out.println("Success!");
+	     }catch(ClassNotFoundException ee) {
+	        System.err.println("error = "+ee.getMessage());
+	        System.exit(1);
+	     }
+	  try {
+	       conn = DriverManager.getConnection(URL,USER_UNIVERSITY,USER_PASSWD);
+	        System.out.println("디비연결성공");
+	     }catch(SQLException ex) {
+	        ex.printStackTrace();
+	        System.err.println("Cannot get a connection: "+ex.getMessage());
+	        System.exit(1);
+	     }
+	  //DB 연결
+	  
+	  //title_id 에 맞는 movie의 정보 읽어오기 
+	  try {
+		  conn.setAutoCommit(false);
+		  stmt = conn.createStatement();
+		  sql = "SELECT title, is_adult, runtime_minute, ost, audience, hasclip, director, writer, startyear, endyear, type "
+				  +"FROM MOVIE WHERE title_id = "+title_id;
 		  
+		  ResultSet rs = stmt.executeQuery(sql);
+		  while(rs.next())
+		  {
+			  title = rs.getString(1);
+			  is_adult = rs.getString(2);
+			  runtime_minute = rs.getString(3);
+			  ost = rs.getString(4);
+			  audience = rs.getString(5);
+			  hasclip = rs.getString(6);
+			  director = rs.getString(7);
+			  writer= rs.getString(8);
+			  startyear = rs.getString(9);
+			  endyear = rs.getString(10);
+			  type = rs.getString(11);
+			  
+			  //System.out.println(title);
+		  }
+		  rs.close();
+	  }catch(SQLException ex)
+	  {
+		  System.err.println("sql error = "+ex.getMessage());
+		  System.exit(1);
+	  }
+	  //movie 의 평점 읽어오기 
+	  try {
+		  conn.setAutoCommit(false);
+		  stmt = conn.createStatement();
+		  sql = "SELECT Mt_id, AVG(Score) FROM RATING"
+				  +" WHERE Mt_id = "+title_id
+				  +" GROUP BY Mt_id";
 		  
-		//DB에서 MOVIE리스트 가져오기
+		  ResultSet rs = stmt.executeQuery(sql);
+		  while(rs.next())
+		  {
+			  score = rs.getString(2);
+			  
+			  //System.out.println(title);
+		  }
+		  rs.close();
+	  }catch(SQLException ex)
+	  {
+		  System.err.println("sql error = "+ex.getMessage());
+		  System.exit(1);
+	  }
+	  
+	  //movie의 장르 읽어오기 
+	 try {
+		  conn.setAutoCommit(false);
+		  stmt = conn.createStatement();
+		  sql = "SELECT Gnum FROM HAS_GENRE WHERE M_id = "+title_id;
 		  
-		try {
-			 conn.setAutoCommit(false);
-			 stmt = conn.createStatement();
-			
-			
-			 String sql = "SELECT title_id FROM MOVIE"
-					+ " minus"
-					+ " SELECT title_id FROM MOVIE,RATING WHERE title_id ="
-					+ " MT_id AND Rate_id = '"+id+"'";
-			 ResultSet rs = stmt.executeQuery(sql);
-			 int title_id;
-			 while(rs.next()) {
-				 title_id =rs.getInt(1);
-				 non_rate_movie.add(title_id);
-				 //평가하지 않은 movie들의 title_id를 arraylist non_rate_movie에 저장
-			 }
-			 
-			 rs.close();
-		}catch(SQLException ex2)
-		{
-			System.err.println("sql error = "+ex2.getMessage());
-			System.exit(1);
-		}
-		 //사용자 이름 받아오기
-		try {
-			 conn.setAutoCommit(false);
-			 stmt = conn.createStatement();
-			
-			
-			 String sql = "SELECT name FROM ACCOUNT WHERE Account_id = '"+id+"'";
-			 ResultSet rs = stmt.executeQuery(sql);
-			 
-			 while(rs.next()) {
-				 username = rs.getString(1);
-			 }
-			 
-			 rs.close();
-		}catch(SQLException ex2)
-		{
-			System.err.println("sql error = "+ex2.getMessage());
-			System.exit(1);
-		}
-		
-		JMenuBar mb = new JMenuBar();
-		JMenu menu = new JMenu("MENU");
-		
-		JMenuItem search_name = new JMenuItem("제목으로 검색");
-		JMenuItem search_condition = new JMenuItem("조건으로 검색");
-		JMenuItem go_mypage = new JMenuItem("My page");
-		JMenuItem logout = new JMenuItem("Logout");
-		
-		menu.add(search_name);
-		menu.add(search_condition);
-		menu.add(go_mypage);
-		menu.add(logout);
-		
-		mb.add(menu);
-		
-		JPanel welcomepanel = new JPanel(new GridLayout(2,1));
-		JLabel name = new JLabel(username+"님 환영합니다!");
-		JLabel show = new JLabel(":::MOVIE 목록:::");
-		welcomepanel.add(name);
-		welcomepanel.add(show);
-		JPanel movielistpanel = new JPanel();
-		movielistpanel.setLayout(new BoxLayout(movielistpanel, BoxLayout.Y_AXIS));
-		ButtonGroup movielist = new ButtonGroup();
-		JScrollPane scroll = new JScrollPane(movielistpanel,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-		for(int i=0;i<non_rate_movie.size();i++)
-		{
-			//평가하지 않은 movie들을 radiobutton으로 추가
-			try {
-				 conn.setAutoCommit(false);
-				 stmt = conn.createStatement();
-				
-				
-				 String sql = "SELECT title FROM MOVIE WHERE title_id = "
-						+ non_rate_movie.get(i);
-				 //title_id 에 맞는 title들 가져오기
-				 ResultSet rs = stmt.executeQuery(sql);
-				 while(rs.next()) {
-					 String title = rs.getString(1);
-					 btnlist.add(new JRadioButton(non_rate_movie.get(i)+"-"+title));
-					 movielist.add((AbstractButton) btnlist.get(i));
-					 movielistpanel.add((AbstractButton) btnlist.get(i));
-					 //평가하지 않은 movie들의 title_id를 arraylist non_rate_movie에 저장
-				 }
-				 
-				 rs.close();
-			}catch(SQLException ex2)
-			{
-				System.err.println("sql error = "+ex2.getMessage());
-				System.exit(1);
-			}
-			
-		}
-		JButton showdetailbtn = new JButton("상세보기");
-		
-		//JTextArea showmovie = new JTextArea();
-		//JScrollPane sp = new JScrollPane(showmovie);
-		
-		
-		setJMenuBar(mb);
-		setLayout(new BorderLayout());
-		add(welcomepanel,BorderLayout.NORTH);
-		add(scroll,BorderLayout.CENTER);
-		add(showdetailbtn,BorderLayout.SOUTH);
-		
-		setVisible(true);
-		setSize(1000,650);
-		setLocationRelativeTo(null); 		//윈도우를 컴퓨터 중간에 띄우기
-		setResizable(false);
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		
-		showdetailbtn.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e)
-			{
-				//선택한 영화의 title_id 를 인자로
-				//상세페이지 호출
-				String str = "";
-				for(int i=0;i<btnlist.size();i++)
-				{	//버튼들 중 체크된 버튼의 문자열 가져오기
-					if(((AbstractButton) btnlist.get(i)).isSelected())
-					{
-						str = ((AbstractButton) btnlist.get(i)).getText();
-					}
-				}
-				//가져온 문자열에서 title_id를 추출함
-				StringTokenizer token = new StringTokenizer(str,"-");
-				String data = token.nextToken();
-				
-				new Moredeep(Integer.parseInt(data));
-				
-			}
-		});
-		
-		
-		
-		search_name.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e)
-			{	//제목으로 찾기
-				//new SubjectSearch();
-			}
-		});
-		
-		search_condition.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e)
-			{	//조건으로 찾기
-				//new OptionSearch();
-			}
-		});
-		
-		go_mypage.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e)
-			{	//마이페이지
-				
-			}
-		});
-		
-		logout.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e)
-			{	//로그아웃
-				dispose();		
-				new Login(); //다시 로그인창으로 돌아감
-			}
-		});
-		
-		
-	} 
-
+		  ResultSet rs = stmt.executeQuery(sql);
+		  while(rs.next())
+		  {
+			  genre.add(rs.getInt(1));
+		  }
+		  rs.close();
+	  }catch(SQLException ex)
+	  {
+		  System.err.println("sql error = "+ex.getMessage());
+		  System.exit(1);
+	  }
+	  
+	  //movie의 version 읽어오기
+	  try {
+		  conn.setAutoCommit(false);
+		  stmt = conn.createStatement();
+		  sql = "SELECT V_id FROM HAS_VERSION WHERE Acs_id ="+title_id;
+		  ResultSet rs = stmt.executeQuery(sql);
+		  while(rs.next())
+		  {
+			  version.add(rs.getInt(1));
+		  }
+		  rs.close();
+	  }catch(SQLException ex)
+	  {
+		  System.err.println("sql error = "+ex.getMessage());
+		  System.exit(1);
+	  }
+	  
+	  JPanel titlepanel = new JPanel();
+	  JLabel titlelabel = new JLabel("<<"+title+">>");
+	  titlepanel.add(titlelabel);
+	  
+	  JPanel yearpanel = new JPanel();
+	  if(endyear==null)
+	  {
+		  year = startyear;
+	  }
+	  else
+		  year = startyear+"-"+endyear;
+	  JLabel yearlabel = new JLabel("year: "+year);
+	  yearpanel.add(yearlabel);
+	  
+	  JPanel runpanel = new JPanel();
+	  JLabel runlabel = new JLabel("runtime minute: "+runtime_minute);
+	  runpanel.add(runlabel);
+	  
+	  JPanel directorpanel = new JPanel();
+	  JLabel directorlabel = new JLabel("director: "+director);
+	  directorpanel.add(directorlabel);
+	  
+	  JPanel writerpanel = new JPanel();
+	  JLabel writerlabel = new JLabel("writer: "+writer);
+	  writerpanel.add(writerlabel);
+	  
+	  JPanel genrepanel = new JPanel();
+	  String genrestr="";
+	  for(int i =0;i<genre.size();i++)
+	  {
+		  switch(genre.get(i)) {
+		  case 1 :
+			  genrestr = genrestr+(i+1)+"."+"Horror"+" " ;
+			  break;
+		  case 2 :
+			  genrestr = genrestr+(i+1)+"."+"Thriller"+" " ;
+			  break;
+		  case 3 :
+			  genrestr = genrestr+(i+1)+"."+"Sci-Fi"+" " ;
+			  break;
+		  case 4 :
+			  genrestr = genrestr+(i+1)+"."+"Crime"+" " ;
+			  break;
+		  case 5 :
+			  genrestr = genrestr+(i+1)+"."+"Drama"+" " ;
+			  break;
+		  case 6 :
+			  genrestr = genrestr+(i+1)+"."+"Fantasy"+" " ;
+			  break;
+		  case 7 :
+			  genrestr = genrestr+(i+1)+"."+"Animation"+" " ;
+			  break;
+		  case 8 :
+			  genrestr = genrestr+(i+1)+"."+"Comedy"+" " ;
+			  break;
+		  case 9 :
+			  genrestr = genrestr+(i+1)+"."+"Romance"+" " ;
+			  break;
+		  case 10 :
+			  genrestr = genrestr+(i+1)+"."+"Action"+" " ;
+			  break;
+			  
+		  }
+	  }
+	  JLabel genrelabel = new JLabel("genre: "+genrestr);
+	  genrepanel.add(genrelabel);
+	  
+	  JPanel versionpanel = new JPanel();
+	  String versionstr="";
+	  for(int i =0;i<version.size();i++)
+	  {
+		  switch(version.get(i)) {
+		  case 1 :
+			  versionstr = versionstr+(i+1)+"."+"KR"+" " ;
+			  break;
+		  case 2 :
+			  versionstr = versionstr+(i+1)+"."+"US"+" " ;
+			  break;
+		  case 3 :
+			  versionstr = versionstr+(i+1)+"."+"UK"+" " ;
+			  break;
+		  case 4 :
+			  versionstr = versionstr+(i+1)+"."+"JP"+" " ;
+			  break;
+		  case 5 :
+			  versionstr = versionstr+(i+1)+"."+"CN"+" " ;
+			  break;
+		  case 6 :
+			  versionstr = versionstr+(i+1)+"."+"FR"+" " ;
+			  break;
+			  
+		  }
+	  }
+	  JLabel versionlabel = new JLabel("version: "+versionstr);
+	  versionpanel.add(versionlabel);
+	  
+	  JPanel typepanel = new JPanel();
+	  JButton epbtn = new JButton("show episodes");
+	  switch(type) {
+		  case "s":
+			  typepanel.add(new JLabel("type: TV Series"));
+			  //시리즈의 경우, 에피소드가 존재함...
+			  
+			  typepanel.add(epbtn);
+			  break;
+		  case "m":
+			  typepanel.add(new JLabel("type: Movie"));
+			  break;
+		  case "o":
+			  typepanel.add(new JLabel("type: KnuMovieDB Original"));
+			  break;
+	
+	  }
+	  
+	  JPanel scorepanel = new JPanel();
+	  JLabel scorelabel = new JLabel("score: "+score);
+	  scorepanel.add(scorelabel);
+	  
+	  JPanel adultpanel = new JPanel();
+	  switch(is_adult) {
+	  case"false" :
+		  adultpanel.add(new JLabel("청소년 관람 가능"));
+		  break;
+	  case"true":
+		  adultpanel.add(new JLabel("청소년 관람 불가"));
+		  break;
+	  }
+	  
+	 
+	  JPanel ostpanel = new JPanel();
+	  JLabel ostlabel = new JLabel("ost: "+ost);
+	  ostpanel.add(ostlabel);
+	  
+	  JPanel audiencepanel = new JPanel();
+	  JLabel audiencelabel = new JLabel("audience: "+audience);
+	  audiencepanel.add(audiencelabel);
+	  
+	  JPanel clippanel = new JPanel();
+	  switch(hasclip) {
+	  case"false" :
+		  clippanel.add(new JLabel("clip not exists"));
+		  break;
+	  case"true":
+		  clippanel.add(new JLabel("clip exists"));
+		  break;
+	  }
+	  
+	  JPanel ratingpanel = new JPanel(new GridLayout(1,3));
+	  JLabel ratinglabel = new JLabel("");
+	  Choice ratingscore = new Choice();
+	  String line = "----------";
+	  ratingscore.add(line);
+	  ratingscore.add("1");
+	  ratingscore.add("2");
+	  ratingscore.add("3");
+	  ratingscore.add("4");
+	  ratingscore.add("5");
+	  ratingscore.add("6");
+	  ratingscore.add("7");
+	  ratingscore.add("8");
+	  ratingscore.add("9");
+	  ratingscore.add("10");
+	  
+	  JButton ratingbtn = new JButton("점수주기");
+	  ratingpanel.add(ratinglabel);
+	  ratingpanel.add(ratingscore);
+	  ratingpanel.add(ratingbtn);
+	  
+	  JButton actbtn = new JButton("출연배우보기");
+	  
+	  
+	  JPanel center = new JPanel(new GridLayout(1,2));
+	  JPanel center1 = new JPanel(new GridLayout(8,1));
+	  JPanel center2 = new JPanel(new GridLayout(8,1));
+	  
+	  center1.add(yearpanel);
+	  center1.add(runpanel);
+	  center1.add(directorpanel);
+	  center1.add(writerpanel);
+	  center1.add(genrepanel);
+	  center1.add(versionpanel);
+	  center1.add(ratingpanel);
+	  
+	  center2.add(typepanel);
+	  center2.add(scorepanel);
+	  center2.add(adultpanel);
+	  center2.add(ostpanel);
+	  center2.add(audiencepanel);
+	  center2.add(clippanel);
+	  center2.add(actbtn);
+	  
+	  center.add(center1);
+	  center.add(center2);
+	  JButton closeBtn = new JButton("닫기");
+	  
+	  //
+	  
+	  add(titlepanel,BorderLayout.NORTH);
+	  add(center,BorderLayout.CENTER);
+	  add(closeBtn,BorderLayout.SOUTH);
+	 
+        closeBtn.addActionListener(new ActionListener()
+        {
+        	public void actionPerformed(ActionEvent e)
+        	{
+        		dispose();
+        		new MovieList(Account_id);
+        		//평가를 적용한 새로윤 list를 보여줌
+        	}
+        });
+        
+        
+        ratingbtn.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+        		int cnt = 0;
+        		try {
+        			  conn.setAutoCommit(false);
+        			  stmt = conn.createStatement();
+        			  sql = "SELECT count(*) FROM RATING";
+        			  
+        			  ResultSet rs = stmt.executeQuery(sql);
+        			  while(rs.next())
+        			  {
+        				  cnt = rs.getInt(1);
+        				  cnt++;
+        				  //System.out.println(title);
+        			  }
+        			  rs.close();
+        		  }catch(SQLException ex)
+        		  {
+        			  System.err.println("sql error = "+ex.getMessage());
+        			  System.exit(1);
+        		  }
+        		
+        		try {
+      			  conn.setAutoCommit(false);
+      			  stmt = conn.createStatement();
+      			  sql = "INSERT INTO RATING VALUES("+cnt+","+title_id+",'"+Account_id+
+      					  "',"+ratingscore.getSelectedItem()+")";
+      			 int res = stmt.executeUpdate(sql);
+      			  conn.commit();
+      			JOptionPane.showMessageDialog(null, "평가완료.");
+      			ratingscore.disable();
+      			
+      		  }catch(SQLException ex)
+      		  {
+      			  System.err.println("sql error = "+ex.getMessage());
+      			  System.exit(1);
+      		  }
+        		
+        	}
+        	
+        });
+        
+        actbtn.addActionListener(new ActionListener()
+        {
+        	public void actionPerformed(ActionEvent e)
+        	{
+        		new ShowActor(title_id);
+        	}
+        });
+        
+        epbtn.addActionListener(new ActionListener()
+        {
+        	public void actionPerformed(ActionEvent e)
+        	{
+        		new ShowEp(title_id);
+        	}
+        });
+        
+        setVisible(true);
+        setSize(1000,650);
+        setLocationRelativeTo(null);    
+        setResizable(false);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	}
+	
 }
