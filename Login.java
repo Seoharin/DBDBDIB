@@ -161,7 +161,7 @@ public class Login extends JFrame {
 				  }
 				       
 				  
-				
+				dispose();
 					
 			}
 		});
