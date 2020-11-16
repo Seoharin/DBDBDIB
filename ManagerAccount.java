@@ -201,7 +201,8 @@ public class ManagerAccount extends JFrame {
      		{
      			if(btnlist.get(i).isSelected())
      			{
-     				new Update_info(movie_list.get(i));
+     				dispose();
+     				new Update_info(id,movie_list.get(i));
      			}
      		}
      	}
