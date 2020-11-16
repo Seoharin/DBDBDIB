@@ -136,9 +136,11 @@ public class Login extends JFrame {
 							 }
 								if(iscustomer.equals("false")) { //when administer account
 									new ManagerAccount(id);
+									 dispose();
 								}
 								else { //when customer account
 									new MovieList(id);
+									 dispose();
 								}
 							}
 						 else { //비밀번호 틀리면 
@@ -161,7 +163,7 @@ public class Login extends JFrame {
 				  }
 				       
 				  
-				dispose();
+				
 					
 			}
 		});
