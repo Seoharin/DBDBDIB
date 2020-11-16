@@ -1,0 +1,157 @@
+package dbdbdib;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.awt.BorderLayout;
+import java.awt.Checkbox;
+import java.awt.Choice;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+
+import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+public class AddRole extends JFrame {
+
+	public static final String URL = "jdbc:oracle:thin:@localhost:1521:orcl";
+	   public static final String USER_UNIVERSITY ="university";
+	   public static final String USER_PASSWD ="comp322";
+	   Connection conn = null; // Connection object
+		Statement stmt = null;   // Statement object
+		String sql = "";
+		ArrayList<Integer> id = new ArrayList<>(); 
+		
+	public AddRole(int title_id, int act_id)
+	{
+		try {
+	        //Load a JDBC driver for Oracle DBMS
+	        Class.forName("oracle.jdbc.driver.OracleDriver");
+	        //Get a Connection object
+	        System.out.println("Success!");
+	     }catch(ClassNotFoundException ee) {
+	        System.err.println("error = "+ee.getMessage());
+	        System.exit(1);
+	     }
+	  try {
+	       conn = DriverManager.getConnection(URL,USER_UNIVERSITY,USER_PASSWD);
+	        System.out.println("디비연결성공");
+	     }catch(SQLException ex) {
+	        ex.printStackTrace();
+	        System.err.println("Cannot get a connection: "+ex.getMessage());
+	        System.exit(1);
+	     }
+	  
+	  try {
+		  conn.setAutoCommit(false);
+		  stmt = conn.createStatement();
+		  sql = "SELECT Role_id FROM ROLED";		  
+		  ResultSet rs = stmt.executeQuery(sql);
+		  while(rs.next())
+		  {
+			 id.add(rs.getInt(1));
+		  }
+		  rs.close();
+	  }catch(SQLException ex)
+	  {
+		  System.err.println("sql error = "+ex.getMessage());
+		  System.exit(1);
+	  }
+	  
+	  JPanel north = new JPanel();
+	  north.add(new JLabel("배우 추가"));
+	  
+	  JPanel center = new JPanel(new GridLayout(4,1));
+	  JPanel agepanel = new JPanel();
+	  JLabel agelabel = new JLabel("영상 내 나이 :");
+	  JTextField agefield = new JTextField(30);
+	  agepanel.add(agelabel);
+	  agepanel.add(agefield);
+	  
+	  JPanel nationalitypanel = new JPanel();
+	  JLabel nationalitylabel = new JLabel("영상 내 국적 :");
+	  JTextField nationalityfield = new JTextField(30);
+	  nationalitypanel.add(nationalitylabel);
+	  nationalitypanel.add(nationalityfield);
+	  
+	  JPanel namepanel = new JPanel();
+	  JLabel namelabel = new JLabel("영상 내 역할명 :");
+	  JTextField namefield = new JTextField(30);
+	  namepanel.add(namelabel);
+	  namepanel.add(namefield);
+	  
+	  JPanel isleadpanel = new JPanel();
+	  JLabel isleadlabel = new JLabel("주연 여부");
+	  Checkbox lead = new Checkbox("주연일 경우 체크");
+	  isleadpanel.add(isleadlabel);
+	  isleadpanel.add(lead);
+	  
+	  center.add(agepanel);
+	  center.add(nationalitypanel);
+	  center.add(namepanel);
+	  center.add(isleadpanel);
+	  
+	  JButton add = new JButton("추가");
+	  
+	  setLayout(new BorderLayout());
+	  
+	  add(north,BorderLayout.NORTH);
+	  add(center,BorderLayout.CENTER);
+	  add(add,BorderLayout.SOUTH);
+	  
+	  
+	  setVisible(true);
+		setSize(1000,650);
+		setLocationRelativeTo(null); 		//윈도우를 컴퓨터 중간에 띄우기
+		setResizable(false);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		
+		add.addActionListener(new ActionListener() { 
+			public void actionPerformed(ActionEvent e) {
+				int roleid = id.get(id.size()-1);
+				String age = agefield.getText();
+				String nationality = nationalityfield.getText();
+				String rname = namefield.getText();
+				String is="false";
+				if(lead.getState())
+				{
+					is = "true";
+				}
+				try {
+					sql = "INSERT INTO ROLED VALUES("+title_id+","+act_id+","+roleid+1+","+age+",'"+nationality+"','"
+							+rname+"','"+is+"')";
+					System.out.println(sql);
+					int res = stmt.executeUpdate(sql);
+					conn.commit();
+				}catch(SQLException ex2) {
+					System.err.println("sql error = "+ex2.getMessage());
+					System.exit(1);
+				}
+				
+				
+				JOptionPane.showMessageDialog(null, "추가되었습니다.");
+				dispose();
+				new AddActor(title_id);
+			}
+		});
+		
+		
+		
+	}
+}
