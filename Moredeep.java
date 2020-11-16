@@ -248,9 +248,13 @@ public class Moredeep extends JFrame{
 	  versionpanel.add(versionlabel);
 	  
 	  JPanel typepanel = new JPanel();
+	  JButton epbtn = new JButton("show episodes");
 	  switch(type) {
 		  case "s":
 			  typepanel.add(new JLabel("type: TV Series"));
+			  //시리즈의 경우, 에피소드가 존재함...
+			  
+			  typepanel.add(epbtn);
 			  break;
 		  case "m":
 			  typepanel.add(new JLabel("type: Movie"));
@@ -353,7 +357,8 @@ public class Moredeep extends JFrame{
         	public void actionPerformed(ActionEvent e)
         	{
         		dispose();
-        		new Searchresult();
+        		new MovieList(Account_id);
+        		//평가를 적용한 새로윤 list를 보여줌
         	}
         });
         
@@ -405,6 +410,14 @@ public class Moredeep extends JFrame{
         	public void actionPerformed(ActionEvent e)
         	{
         		new ShowActor(title_id);
+        	}
+        });
+        
+        epbtn.addActionListener(new ActionListener()
+        {
+        	public void actionPerformed(ActionEvent e)
+        	{
+        		new ShowEp(title_id);
         	}
         });
         
