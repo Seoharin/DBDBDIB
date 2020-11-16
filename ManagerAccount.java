@@ -98,8 +98,9 @@ public class ManagerAccount extends JFrame {
 				  
 				  sql = "SELECT Mt_id, AVG(Score) FROM RATING"
 						  +" WHERE Mt_id = "+title_id+" GROUP BY Mt_id";
+				  
 				  ResultSet rs2 = stmt.executeQuery(sql);
-				  while(rs2.next())
+				  if(rs2.next())
 				  {
 					  String score = rs2.getString(2);
 					  if(score.length()>4)
@@ -110,6 +111,9 @@ public class ManagerAccount extends JFrame {
 					  {
 						  movies_rate.add(score);
 					  }
+				  }
+				  else {
+					  movies_rate.add("0");
 				  }
 				  rs2.close();
 			  }catch(SQLException ex)
@@ -161,7 +165,7 @@ public class ManagerAccount extends JFrame {
      for(int i=0;i<movie_list.size();i++)
 		{
 			//평가하지 않은 movie들을 radiobutton으로 추가
-    	   btnlist.add(new JRadioButton(movie_list.get(i)+"-"+movies_name.get(i)+", 평점: "+movies_rate.get(i)));
+    	    btnlist.add(new JRadioButton(movie_list.get(i)+"-"+movies_name.get(i)+", 평점: "+movies_rate.get(i)));
 			movielist.add(btnlist.get(i));
 			showpanel.add(btnlist.get(i));
 		}
