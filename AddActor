@@ -1,0 +1,183 @@
+package dbdbdib;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.awt.BorderLayout;
+import java.awt.Checkbox;
+import java.awt.Choice;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+
+import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+
+import javax.swing.JFrame;
+public class AddActor extends JFrame{
+	public static final String URL = "jdbc:oracle:thin:@localhost:1521:orcl";
+	   public static final String USER_UNIVERSITY ="university";
+	   public static final String USER_PASSWD ="comp322";
+	   Connection conn = null; // Connection object
+		Statement stmt = null;   // Statement object
+		
+		ArrayList <Integer> id = new ArrayList<>();
+		ArrayList<String> name = new ArrayList<>();
+		ArrayList<String> sex = new ArrayList<>();
+		ArrayList<String> birth = new ArrayList<>();
+		ArrayList<JRadioButton> btn = new ArrayList<>();
+		String sql = "";
+		int cnt = 0;
+		String title="";
+		
+	public AddActor(int title_id)
+	{
+		try {
+	        //Load a JDBC driver for Oracle DBMS
+	        Class.forName("oracle.jdbc.driver.OracleDriver");
+	        //Get a Connection object
+	        System.out.println("Success!");
+	     }catch(ClassNotFoundException ee) {
+	        System.err.println("error = "+ee.getMessage());
+	        System.exit(1);
+	     }
+	  try {
+	       conn = DriverManager.getConnection(URL,USER_UNIVERSITY,USER_PASSWD);
+	        System.out.println("디비연결성공");
+	     }catch(SQLException ex) {
+	        ex.printStackTrace();
+	        System.err.println("Cannot get a connection: "+ex.getMessage());
+	        System.exit(1);
+	     }
+	   //디비 연결
+	  
+	  try {
+		  conn.setAutoCommit(false);
+		  stmt = conn.createStatement();
+		  sql =  "SELECT Act_id FROM ACTOR minus SELECT A_id FROM ROLED WHERE Movie_id = "+title_id;		  
+		  ResultSet rs = stmt.executeQuery(sql);
+		  int i = 0;
+		  while(rs.next())
+		  {
+			  
+			  id.add(rs.getInt(1));
+			  try {
+				  conn.setAutoCommit(false);
+				  stmt = conn.createStatement();
+				  sql = "SELECT name, sex, birth FROM ACTOR where act_id = "+id.get(i);	
+				  i++;
+				  ResultSet rs2 = stmt.executeQuery(sql);
+				 
+				  while(rs2.next())
+				  {
+					 name.add(rs2.getString(1));
+					 if(rs2.getString(2).equals("F"))
+					 {
+						 sex.add("woman");
+					 }
+					 else
+					 {
+						 sex.add("man");
+					 }
+					 
+					 birth.add(rs2.getString(3).substring(0,10));
+				  }
+				  rs2.close();
+			  }catch(SQLException ex)
+			  {
+				  System.err.println("sql error = "+ex.getMessage());
+				  System.exit(1);
+			  }
+		  }
+		  rs.close();
+	  }catch(SQLException ex)
+	  {
+		  System.err.println("sql error = "+ex.getMessage());
+		  System.exit(1);
+	  }
+	  
+	  
+	  try {
+		  conn.setAutoCommit(false);
+		  stmt = conn.createStatement();
+		  sql = "SELECT title FROM MOVIE WHERE title_id = "+title_id;		  
+		  ResultSet rs = stmt.executeQuery(sql);
+		  while(rs.next())
+		  {
+			  title = rs.getString(1);
+			  
+		  }
+		  rs.close();
+	  }catch(SQLException ex)
+	  {
+		  System.err.println("sql error = "+ex.getMessage());
+		  System.exit(1);
+	  }
+	  
+	  JPanel north = new JPanel();
+	  north.add(new JLabel("<< "+title+"의 출연 배우 추가 >>"));
+	  
+	  
+	  JPanel center = new JPanel();
+	  
+	  
+	    center.setLayout(new BoxLayout(center, BoxLayout.Y_AXIS));
+		ButtonGroup br = new ButtonGroup();
+		JScrollPane scroll = new JScrollPane(center,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		
+		for(int i=0;i<id.size();i++)
+		{
+			btn.add(new JRadioButton("이름 : "+name.get(i)+", 성별: "+sex.get(i)+", 생년월일: "+birth.get(i)));
+			br.add(btn.get(i));
+			center.add(btn.get(i));
+		}
+		
+		JButton addbtn = new JButton("추가하기");
+	  
+		setLayout(new BorderLayout());
+		add(north,BorderLayout.NORTH);
+		add(scroll,BorderLayout.CENTER);
+		add(addbtn, BorderLayout.SOUTH);
+		
+
+		setVisible(true);
+		setSize(1000,650);
+		setLocationRelativeTo(null); 		//윈도우를 컴퓨터 중간에 띄우기
+		setResizable(false);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		
+		addbtn.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e)
+			{	//로그아웃
+				for(int i=0;i<id.size();i++)
+				{
+					if(btn.get(i).isSelected())
+						
+					{
+						dispose();
+						 new AddRole(title_id, id.get(i));
+					}
+				}
+			}
+		});
+	  
+	  
+	}
+}
