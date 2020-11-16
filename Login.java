@@ -113,27 +113,34 @@ public class Login extends JFrame {
 					  stmt = conn.createStatement();
 					 sql = "SELECT * FROM ACCOUNT WHERE Account_id = '"+id+"'";
 					 ResultSet rs = stmt.executeQuery(sql);
-					 System.out.println(sql);
+					 //System.out.println(sql);
 					 
-					 if(rs != null)
+					 if(rs.next())
 						{
+						 conn.setAutoCommit(false);
+						  stmt = conn.createStatement();
 						 sql = "SELECT password FROM ACCOUNT WHERE Account_id ='"
 								 +id+"'";
-						 rs = stmt.executeQuery(sql);
+						 ResultSet rs2 = stmt.executeQuery(sql);
 						 String inputpw = pwfield.getText().toString();
 						 String pw="";
-						 while(rs.next()) {
-							 pw = rs.getString(1);
+						 while(rs2.next()) {
+							 pw = rs2.getString(1);
 						 }
 						 if(pw.equals(inputpw)) {		//비밀번호 맞으면
+							 conn.setAutoCommit(false);
+							  stmt = conn.createStatement();
 							 sql = "SELECT is_customer FROM ACCOUNT WHERE Account_id = '"
 									 +id+"'";
-							 rs = stmt.executeQuery(sql);
+							ResultSet rs3 = stmt.executeQuery(sql);
 							 String iscustomer="";
-							 while(rs.next())
+							 while(rs3.next())
 							 {
-								 iscustomer = rs.getString(1);
+								 iscustomer = rs3.getString(1);
+								 iscustomer = iscustomer.substring(0, 5);
 							 }
+							System.out.println(iscustomer);
+							System.out.println(iscustomer.length());
 								if(iscustomer.equals("false")) { //when administer account
 									new ManagerAccount(id);
 									 dispose();
@@ -161,10 +168,6 @@ public class Login extends JFrame {
 				  }catch(SQLException ex2) {					  
 					  System.exit(1);
 				  }
-				       
-				  
-				
-					
 			}
 		});
 		
