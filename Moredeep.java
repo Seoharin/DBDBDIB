@@ -106,8 +106,11 @@ public class Moredeep extends JFrame{
 		  while(rs.next())
 		  {
 			  score = rs.getString(2);
+			  if(score.length()>2)
+			  {
+				  score = score.substring(0, 4);
+			  }
 			  
-			  //System.out.println(title);
 		  }
 		  rs.close();
 	  }catch(SQLException ex)
