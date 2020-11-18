@@ -36,6 +36,7 @@ public class AddNewMovie extends JFrame{
 	   public static final String USER_PASSWD ="comp322";
 	   Connection conn = null; // Connection object
 		Statement stmt = null;   // Statement object
+		ArrayList<Integer> id = new ArrayList<>();
 		int title_id = 0;
 		String sql ="";
 		String title= "";
@@ -80,14 +81,12 @@ public class AddNewMovie extends JFrame{
 		try {
 			  conn.setAutoCommit(false);
 			  stmt = conn.createStatement();
-			  sql = "SELECT count(*) FROM MOVIE";
+			  sql = "SELECT title_id FROM MOVIE";
 			  
 			  ResultSet rs = stmt.executeQuery(sql);
 			  while(rs.next())
 			  {
-				  title_id = rs.getInt(1);
-				  title_id++;
-				  //System.out.println(title);
+				  id.add(rs.getInt(1));
 			  }
 			  rs.close();
 		  }catch(SQLException ex)
@@ -204,6 +203,8 @@ public class AddNewMovie extends JFrame{
 			genrepanel.add(genre.get(i));
 		}
 		
+		JButton actor = new JButton("배우등록");
+		
 		JPanel north = new JPanel();
 		north.add(new JLabel("<< 영상물 추가 >>"));
 		JPanel center = new JPanel(new GridLayout(7,2));
@@ -217,7 +218,7 @@ public class AddNewMovie extends JFrame{
 		center.add(clippanel);
 		center.add(directorpanel);
 		center.add(writerpanel);
-		
+		center.add(actor);
 		
 		center.add(typepanel);
 		center.add(versionpanel);
@@ -235,7 +236,7 @@ public class AddNewMovie extends JFrame{
 		add(south,BorderLayout.SOUTH);
 		
 		
-		JButton actor = new JButton("배우등록");
+		
 		
 		
 		
@@ -251,6 +252,7 @@ public class AddNewMovie extends JFrame{
 	     {
 	     	public void actionPerformed(ActionEvent e)
 	     	{
+	     		title_id = id.get(id.size()-1)+1;
 	     		title = titlefield.getText();
 	     		runtime_minute = runtimefield.getText();
 	     		ost = ostfield.getText();
@@ -349,7 +351,9 @@ public class AddNewMovie extends JFrame{
 	     			}
 	     		}
 	     		JOptionPane.showMessageDialog(null, "등록완료.");
+	     		new ManagerAccount(Account_id);
 	     		dispose();
+	     		
 	     	}
 	     });
 	     
@@ -360,6 +364,14 @@ public class AddNewMovie extends JFrame{
 	     	public void actionPerformed(ActionEvent e)
 	     	{
 	     		dispose();
+	     	}
+	     });
+		 
+		 actor.addActionListener(new ActionListener()
+	     {
+	     	public void actionPerformed(ActionEvent e)
+	     	{
+	     		new AddActor(title_id);
 	     	}
 	     });
 		
