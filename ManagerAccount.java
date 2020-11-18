@@ -226,6 +226,7 @@ public class ManagerAccount extends JFrame {
      { //새로운 영상물을 등록하는 class 호출
      	public void actionPerformed(ActionEvent e)
      	{
+     		dispose();
      		new AddNewMovie(id);
      	}
      });
