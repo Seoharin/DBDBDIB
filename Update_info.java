@@ -135,7 +135,7 @@ public class Update_info extends JFrame{
 		writerpanel.add(writerlabel);
 		writerpanel.add(writerfield);
 		
-		JPanel typepanel = new JPanel();
+		/*JPanel typepanel = new JPanel();
 		JLabel typelabel = new JLabel("타입 : ");
 		ButtonGroup gr = new ButtonGroup();
 		JRadioButton s  = new JRadioButton("TV Series");
@@ -147,7 +147,7 @@ public class Update_info extends JFrame{
 		typepanel.add(typelabel);
 		typepanel.add(s);
 		typepanel.add(o);
-		typepanel.add(m);
+		typepanel.add(m);*/
 		
 		JPanel startyearpanel = new JPanel();
 		JLabel startyearlabel = new JLabel("방영시작일(mm-dd-yyyy) : ");
@@ -212,7 +212,7 @@ public class Update_info extends JFrame{
 		center.add(versionpanel);
 		center.add(addactor);
 		
-		center.add(typepanel);
+		//center.add(typepanel);
 		center.add(delactor);
 		
 		center.add(genrepanel);
@@ -270,7 +270,7 @@ public class Update_info extends JFrame{
 	     		}
 	     		else
 	     			hasclip = "false";
-	     		if(s.isSelected())
+	     		/*if(s.isSelected())
 	     		{
 	     			type = "s";
 	     		}
@@ -282,7 +282,7 @@ public class Update_info extends JFrame{
 	     		{
 	     			type = "m";
 	     		}
-	     		
+	     		*/
 	     		
 	     		try {
 	     			conn.setAutoCommit(false);
@@ -291,13 +291,13 @@ public class Update_info extends JFrame{
 					{
 						sql = "UPDATE MOVIE SET is_adult = '"+is_adult+"', runtime_minute = "+runtime_minute+", ost = '"+ost+"', audience = "
 								+audience+", hasclip = '"+hasclip+"', director = '"+director +"', writer = '"+writer+"', startyear = TO_DATE('"+
-								startyear +"','mm-dd-yyyy'), endyear = NULL, type = '"+type+"' WHERE title_id = "+title_id;
+								startyear +"','mm-dd-yyyy'), endyear = NULL WHERE title_id = "+title_id;
 					}
 					else
 					{
 						sql = "UPDATE MOVIE SET is_adult = '"+is_adult+"', runtime_minute = "+runtime_minute+", ost = '"+ost+"', audience = "
 								+audience+", hasclip = '"+hasclip+"', director = '"+director +"', writer = '"+writer+"', startyear = TO_DATE('"+
-								startyear +"','mm-dd-yyyy'), endyear = TO_DATE('"+endyear+"','mm-dd-yyyy')"+", type = '"+type+"' WHERE title_id = "+title_id;
+								startyear +"','mm-dd-yyyy'), endyear = TO_DATE('"+endyear+"','mm-dd-yyyy') WHERE title_id = "+title_id;
 					}
 					
 					//System.out.println(sql);
@@ -369,6 +369,7 @@ public class Update_info extends JFrame{
      		}
 	     		
 	     		JOptionPane.showMessageDialog(null, "수정 완료.");
+	     		new ManagerAccount(Account_id);
 	     		dispose();
 	     	}
 	     });
