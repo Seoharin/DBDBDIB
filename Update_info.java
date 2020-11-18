@@ -72,11 +72,12 @@ public class Update_info extends JFrame{
 	  try {
 		  conn.setAutoCommit(false);
 		  stmt = conn.createStatement();
-		  sql = "SELECT title FROM MOVIE WHERE title_id = "+title_id;
+		  sql = "SELECT title, type FROM MOVIE WHERE title_id = "+title_id;
 		  ResultSet rs = stmt.executeQuery(sql);
 		  while(rs.next())
 		  {
 			  title = rs.getString(1);
+			  type = rs.getString(2);
 			  
 		  }
 		  rs.close();
@@ -195,6 +196,7 @@ public class Update_info extends JFrame{
 		
 		JButton addactor = new JButton("배우 추가");
 		JButton delactor = new JButton("배우 삭제");
+		JButton addep = new JButton("에피소드 추가");
 		
 		JPanel center = new JPanel(new GridLayout(7,2));
 		center.add(titlepanel);
@@ -214,7 +216,10 @@ public class Update_info extends JFrame{
 		
 		//center.add(typepanel);
 		center.add(delactor);
-		
+		if(type.equals("s"))
+		{
+			center.add(addep);
+		}
 		center.add(genrepanel);
 		
 		JPanel south = new JPanel();
@@ -411,11 +416,29 @@ public class Update_info extends JFrame{
 	     {
 	     	public void actionPerformed(ActionEvent e)
 	     	{
+	     		//dispose();
 	     		new AddActor(title_id);
 	     	}
 	     });
 		
-	
+		 delactor.addActionListener(new ActionListener()
+	     {
+	     	public void actionPerformed(ActionEvent e)
+	     	{
+	     		dispose();
+	     		new DeleteActor(title_id,Account_id);
+	     	}
+	     });
+		 
+		 
+		 addep.addActionListener(new ActionListener()
+	     {
+	     	public void actionPerformed(ActionEvent e)
+	     	{
+	     		dispose();
+	     		new DeleteActor(title_id,Account_id);
+	     	}
+	     });
 	     
 	}
 		
