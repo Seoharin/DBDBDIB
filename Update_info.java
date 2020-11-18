@@ -436,7 +436,7 @@ public class Update_info extends JFrame{
 	     	public void actionPerformed(ActionEvent e)
 	     	{
 	     		dispose();
-	     		new DeleteActor(title_id,Account_id);
+	     		new AddEP(title_id,Account_id);
 	     	}
 	     });
 	     
