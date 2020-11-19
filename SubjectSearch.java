@@ -9,6 +9,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 
 import javax.swing.*;
 
@@ -19,6 +20,7 @@ public class SubjectSearch extends JFrame {
 	Connection conn = null; // Connection object
 	Statement stmt = null;   // Statement object
 	String sql ="";
+	ArrayList<Integer> titlelist = new ArrayList<Integer>();
 	
 	public SubjectSearch(String title)
 	{
@@ -73,10 +75,14 @@ public class SubjectSearch extends JFrame {
 					
 					ResultSet rs = stmt.executeQuery(sql);
 					
-					if (rs.next())
+					while (rs.next()&&!titlelist.contains(rs.getInt("title_id")))
+						titlelist.add(rs.getInt("title_id"));
+					
+					if (!titlelist.isEmpty())//결과가 있으면
 					{
-						new Searchresult();
+						new Searchresult(titlelist);
 					}
+					
 					else
 					{
 						JOptionPane.showMessageDialog(null, "검색 결과가 없습니다.");
@@ -91,7 +97,9 @@ public class SubjectSearch extends JFrame {
 //				
 			
 			}
-	});
+		});
+		
+		
 }
 
 	public static void main(String[] args) {
