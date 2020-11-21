@@ -216,7 +216,7 @@ public class ManagerAccount extends JFrame {
      		{
      			if(btnlist.get(i).isSelected())
      			{
-     				new Show_Rating(movie_list.get(i));
+     				new Manager_ShowRating(movie_list.get(i));
      			}
      		}
      	}
