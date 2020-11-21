@@ -416,8 +416,8 @@ public class Update_info extends JFrame{
 	     {
 	     	public void actionPerformed(ActionEvent e)
 	     	{
-	     		//dispose();
-	     		new AddActor(title_id);
+	     		dispose();
+	     		new AddActor(Account_id,title_id);
 	     	}
 	     });
 		
