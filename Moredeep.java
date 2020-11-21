@@ -368,17 +368,16 @@ public class Moredeep extends JFrame{
         
         ratingbtn.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent e) {
-        		int cnt = 0;
+        		ArrayList<Integer> cnt = new ArrayList<>();
         		try {
         			  conn.setAutoCommit(false);
         			  stmt = conn.createStatement();
-        			  sql = "SELECT count(*) FROM RATING";
+        			  sql = "SELECT Rating_id FROM RATING";
         			  
         			  ResultSet rs = stmt.executeQuery(sql);
         			  while(rs.next())
         			  {
-        				  cnt = rs.getInt(1);
-        				  cnt++;
+        				  cnt.add(rs.getInt(1));
         				  //System.out.println(title);
         			  }
         			  rs.close();
@@ -391,7 +390,7 @@ public class Moredeep extends JFrame{
         		try {
       			  conn.setAutoCommit(false);
       			  stmt = conn.createStatement();
-      			  sql = "INSERT INTO RATING VALUES("+cnt+","+title_id+",'"+Account_id+
+      			  sql = "INSERT INTO RATING VALUES("+cnt.get(cnt.size()-1)+1+","+title_id+",'"+Account_id+
       					  "',"+ratingscore.getSelectedItem()+")";
       			 int res = stmt.executeUpdate(sql);
       			  conn.commit();
