@@ -76,12 +76,17 @@ public class find extends JFrame{
 		pwpanel.add(pw_id_panel);
 		pwpanel.add(findpwbtn);
 		
-		GridLayout gl = new GridLayout(2,1);
-		setLayout(gl);
-
-		add(idpanel);
-		add(pwpanel);
 		
+		JButton close = new JButton("뒤로");
+		setLayout(new BorderLayout());
+		
+		JPanel center = new JPanel(new GridLayout(2,1));
+		
+		center.add(idpanel);
+		center.add(pwpanel);
+		
+		add(center,BorderLayout.CENTER);
+		add(close,BorderLayout.SOUTH);
 		setVisible(true);
 		setSize(1000,650);
 		setLocationRelativeTo(null); 		//윈도우를 컴퓨터 중간에 띄우기
@@ -160,6 +165,16 @@ public class find extends JFrame{
 					System.err.println("sql error = "+ex2.getMessage());
 					System.exit(1);
 				}
+			
+			}
+
+			});
+		
+		close.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e)
+			{	//로그인창을 띄움
+				dispose();
+				new Login();
 			
 			}
 
