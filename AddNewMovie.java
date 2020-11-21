@@ -364,6 +364,7 @@ public class AddNewMovie extends JFrame{
 	     	public void actionPerformed(ActionEvent e)
 	     	{
 	     		dispose();
+	     		new ManagerAccount(Account_id);
 	     	}
 	     });
 		 
@@ -371,7 +372,8 @@ public class AddNewMovie extends JFrame{
 	     {
 	     	public void actionPerformed(ActionEvent e)
 	     	{
-	     		new AddActor(title_id);
+	     		dispose();
+	     		new AddActor(Account_id,title_id);
 	     	}
 	     });
 		
