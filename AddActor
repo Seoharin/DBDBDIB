@@ -47,7 +47,7 @@ public class AddActor extends JFrame{
 		int cnt = 0;
 		String title="";
 		
-	public AddActor(int title_id)
+	public AddActor(String Account_id,int title_id)
 	{
 		try {
 	        //Load a JDBC driver for Oracle DBMS
@@ -149,12 +149,15 @@ public class AddActor extends JFrame{
 			center.add(btn.get(i));
 		}
 		
+		JPanel btns = new JPanel();
 		JButton addbtn = new JButton("추가하기");
-	  
+		JButton close = new JButton("닫기");
+		btns.add(addbtn);
+		btns.add(close);
 		setLayout(new BorderLayout());
 		add(north,BorderLayout.NORTH);
 		add(scroll,BorderLayout.CENTER);
-		add(addbtn, BorderLayout.SOUTH);
+		add(btns, BorderLayout.SOUTH);
 		
 
 		setVisible(true);
@@ -172,9 +175,18 @@ public class AddActor extends JFrame{
 						
 					{
 						dispose();
-						 new AddRole(title_id, id.get(i));
+						 new AddRole(Account_id,title_id, id.get(i));
 					}
 				}
+			}
+		});
+		
+		close.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e)
+			{	//로그아웃
+				
+						dispose();
+						new Update_info(Account_id,title_id);
 			}
 		});
 	  
