@@ -226,7 +226,8 @@ public class MovieList extends JFrame{
 		go_mypage.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e)
 			{	//마이페이지
-				
+				dispose();
+				new Mypage_real(id);
 			}
 		});
 		
