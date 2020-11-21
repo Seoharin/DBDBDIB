@@ -206,6 +206,7 @@ public class Join extends JFrame {
 						pw = pwfield.getText();
 						birth = birthfield.getText();
 						address =addressfield.getText();
+						
 						if(sexbtn.getSelection().equals("남"))
 							sex = "true";
 						else 
