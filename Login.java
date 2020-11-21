@@ -127,6 +127,7 @@ public class Login extends JFrame {
 						 while(rs2.next()) {
 							 pw = rs2.getString(1);
 						 }
+						 
 						 if(pw.equals(inputpw)) {		//비밀번호 맞으면
 							 conn.setAutoCommit(false);
 							  stmt = conn.createStatement();
@@ -139,8 +140,7 @@ public class Login extends JFrame {
 								 iscustomer = rs3.getString(1);
 								 iscustomer = iscustomer.substring(0, 5);
 							 }
-							System.out.println(iscustomer);
-							System.out.println(iscustomer.length());
+							
 								if(iscustomer.equals("false")) { //when administer account
 									new ManagerAccount(id);
 									 dispose();
