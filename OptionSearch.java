@@ -1,4 +1,4 @@
-package teamproject3;
+package teamJDBC;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -23,11 +23,8 @@ public class OptionSearch extends JFrame {
 	ResultSet rs=null;
 	ArrayList<Integer> titlelist = new ArrayList<Integer>();
 
-	public OptionSearch(String title)
+	public OptionSearch()
 	{
-		super(title);
-		super.setSize(1000, 650);
-		
 		JPanel opsearchpanel = new JPanel(new BorderLayout()); //전체 패널(옵션패널+버튼 담음)
 		JPanel optionpanel = new JPanel(); //옵션패널 담는 패널
 		JPanel typepanel = new JPanel(new GridLayout(4,1)); //타입옵션들 있는 패널
@@ -295,7 +292,7 @@ public class OptionSearch extends JFrame {
 					JOptionPane.showMessageDialog(null, "조건을 선택해 주세요.");
 				else {//뭐라도 선택 되면
 					
-					new Searchresult(titlelist);
+					new Search_genreResult(titlelist);
 					
 				}
 			} catch(SQLException ex)
@@ -311,11 +308,12 @@ public class OptionSearch extends JFrame {
 		}
 });
 		
+	    setVisible(true);
+	    setSize(1000,650);
+	    setLocationRelativeTo(null);    
+	    setResizable(false);
+	    setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
 	
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		new OptionSearch("optionsearch");
-	}
 
 }
