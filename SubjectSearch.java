@@ -1,4 +1,4 @@
-package teamproject3;
+package teamJDBC;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -22,10 +22,10 @@ public class SubjectSearch extends JFrame {
 	String sql ="";
 	ArrayList<Integer> titlelist = new ArrayList<Integer>();
 	
-	public SubjectSearch(String title)
+	String inputtitle = "";
+	
+	public SubjectSearch()
 	{
-		super(title);
-		super.setSize(1000, 650);
 		JPanel searchpanel = new JPanel();
 		JLabel titlelabel = new JLabel("제목으로 검색하기");
 		JTextField inputbox = new JTextField(20);
@@ -35,17 +35,8 @@ public class SubjectSearch extends JFrame {
 		searchpanel.add(inputbox);
 		searchpanel.add(searchbtn);
 		
-		this.add(searchpanel);
-
-		super.setVisible(true);
-		super.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		
-		
-		
-		//DB 연결
-		
-	
-		
+		add(searchpanel);
+	    
 		try {
 		        //Load a JDBC driver for Oracle DBMS
 		        Class.forName("oracle.jdbc.driver.OracleDriver");
@@ -67,26 +58,28 @@ public class SubjectSearch extends JFrame {
 		searchbtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e)
 			{
-				String inputtitle = inputbox.getText();
+				inputtitle = inputbox.getText();
 				try {
 					conn.setAutoCommit(false);
 					stmt = conn.createStatement();
-					sql = "Select * from movie where title='"+inputtitle+"'";
+					sql = "select * from movie where title='"+inputtitle+"'";
 					
 					ResultSet rs = stmt.executeQuery(sql);
 					
-					while (rs.next()&&!titlelist.contains(rs.getInt("title_id")))
-						titlelist.add(rs.getInt("title_id"));
-					
+					while (rs.next())
+					{
+						titlelist.add(rs.getInt("title_id"));			
+					}
+						
 					if (!titlelist.isEmpty())//결과가 있으면
 					{
-						new Searchresult(titlelist);
+						new Search_titleResult(titlelist);
 					}
-					
 					else
 					{
 						JOptionPane.showMessageDialog(null, "검색 결과가 없습니다.");
 					}
+					
 				} catch(SQLException ex)
 				{
 					 System.err.println(ex.getMessage());
@@ -94,18 +87,17 @@ public class SubjectSearch extends JFrame {
 					System.exit(1);
 				}
 				
-//				
-			
+				//while (rs.next()&&!titlelist.contains(rs.getInt("title_id")))
 			}
 		});
 		
+		 setVisible(true);
+		    setSize(1000,650);
+		    setLocationRelativeTo(null);    
+		    setResizable(false);
+		    setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
-}
-
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		new SubjectSearch("Knu movie");
-	}
+    }
 
 
 }
